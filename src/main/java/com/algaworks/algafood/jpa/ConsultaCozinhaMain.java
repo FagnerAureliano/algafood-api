@@ -18,12 +18,12 @@ public class ConsultaCozinhaMain {
                 .run(args);
 
         CozinhaRepository cozinhaRepository = applicationContext.getBean(CozinhaRepository.class);
-
-        List<Cozinha> todasCozinhas = cozinhaRepository.listar();
-
-        for (Cozinha cozinha : todasCozinhas) {
-            System.out.println(cozinha.getNome());
-        }
+//
+//        List<Cozinha> todasCozinhas = cozinhaRepository.listar();
+//
+//        for (Cozinha cozinha : todasCozinhas) {
+//            System.out.println(cozinha.getNome());
+//        }
     }
 
 }
