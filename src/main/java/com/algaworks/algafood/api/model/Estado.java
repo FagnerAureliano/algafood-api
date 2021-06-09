@@ -1,4 +1,4 @@
-package com.algaworks.algafood.domain.model;
+package com.algaworks.algafood.api.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +12,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table
-public class Cidade implements Serializable {
+public class Estado implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-
+    @ManyToOne
+    private Cidade cidade;
 
 }

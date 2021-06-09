@@ -1,23 +1,24 @@
-package com.algaworks.algafood.domain.model;
+package com.algaworks.algafood.api.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table
-public class FormaPagamento implements Serializable {
+public class Cozinha implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String descricao;
+    private String nome;
 
 
 }
