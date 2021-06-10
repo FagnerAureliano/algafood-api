@@ -34,4 +34,9 @@ public class RestauranteController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @PutMapping("restaurantes/{id}")
+    public ResponseEntity<Restaurante> atualizar(@PathVariable Long id, @RequestBody Restaurante restaurante){
+        restauranteService.atualizar(id, restaurante);
+        return ResponseEntity.ok(restaurante);
+    }
 }

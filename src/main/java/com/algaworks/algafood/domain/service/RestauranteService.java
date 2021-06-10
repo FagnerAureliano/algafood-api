@@ -40,13 +40,22 @@ public class RestauranteService {
         throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
     }
     public void atualizar(Long id, Restaurante restaurante){
+        try{
         Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
-        boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
-
-        if(restauranteTemp.isPresent() && cozinhaTemp){
-        if( cozinhaTemp) {
+            if(restauranteTemp.isPresent()){
+//                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
+//                if(cozinhaTemp){
+                    Restaurante resTemp = Restaurante.builder().id(id).build();
+                    resTemp.setNome(restaurante.getNome());
+                    resTemp.setTaxaFrete(restaurante.getTaxaFrete());
+                    resTemp.setCozinha(restaurante.getCozinha());
+                    restauranteRepository.save(resTemp);
+//                }
+            }
+            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
+        }catch (EntidadeNaoEncontradaException e){
+            throw new EntidadeNaoEncontradaException(String.format("Teste", id));
         }
-        restauranteRepository.save(restaurante);
-    }
+
     }
 }
