@@ -1,6 +1,7 @@
 package com.algaworks.algafood.domain.service;
 
 import com.algaworks.algafood.api.model.Restaurante;
+import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
@@ -36,26 +37,27 @@ public class RestauranteService {
         boolean cozinhaTemp = cozinhaRepository.existsById(cozinhaId);
         if (cozinhaTemp) {
             restauranteRepository.save(restaurante);
+        }else{
+            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
         }
-        throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
     }
     public void atualizar(Long id, Restaurante restaurante){
-        try{
-        Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
+
+            Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
             if(restauranteTemp.isPresent()){
-//                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
-//                if(cozinhaTemp){
-                    Restaurante resTemp = Restaurante.builder().id(id).build();
-                    resTemp.setNome(restaurante.getNome());
-                    resTemp.setTaxaFrete(restaurante.getTaxaFrete());
-                    resTemp.setCozinha(restaurante.getCozinha());
-                    restauranteRepository.save(resTemp);
-//                }
+                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
+                    if(cozinhaTemp){
+                        Restaurante resTemp = Restaurante.builder().id(id).build();
+                        resTemp.setNome(restaurante.getNome());
+                        resTemp.setTaxaFrete(restaurante.getTaxaFrete());
+                        resTemp.setCozinha(restaurante.getCozinha());
+                        restauranteRepository.save(resTemp);
+                    }else{
+                        throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
+                    }
+            }else{
+                throw new EntidadeNaoEncontradaException(String.format("Restaurante de código %d não encontradoo.", id));
             }
-            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
-        }catch (EntidadeNaoEncontradaException e){
-            throw new EntidadeNaoEncontradaException(String.format("Teste", id));
-        }
 
     }
 }
