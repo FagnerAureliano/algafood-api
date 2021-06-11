@@ -56,8 +56,17 @@ public class RestauranteService {
                         throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
                     }
             }else{
-                throw new EntidadeNaoEncontradaException(String.format("Restaurante de código %d não encontradoo.", id));
+                throw new EntidadeNaoEncontradaException(String.format("Restaurante de código %d não encontrado.", id));
             }
-
+    }
+    public void deletar(Long id){
+        try{
+            boolean restauranteTemp = restauranteRepository.existsById(id);
+            if( restauranteTemp ){
+                restauranteRepository.deleteById(id);
+            }
+        }catch (EntidadeNaoEncontradaException e){
+            throw new EntidadeNaoEncontradaException(String.format("Restaurante de código %d não encontrado.", id));
+        }
     }
 }

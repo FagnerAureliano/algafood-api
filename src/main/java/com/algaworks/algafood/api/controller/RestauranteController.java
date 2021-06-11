@@ -44,4 +44,13 @@ public class RestauranteController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @DeleteMapping("restaurantes/{id}")
+    public ResponseEntity<?> deletar(@PathVariable Long id){
+        try{
+            restauranteService.deletar(id);
+        }catch (EntidadeNaoEncontradaException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
