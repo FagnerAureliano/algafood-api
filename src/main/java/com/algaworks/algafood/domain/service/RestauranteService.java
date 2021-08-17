@@ -31,20 +31,13 @@ public class RestauranteService {
         return ResponseEntity.notFound().build();
     }
 
-    public Restaurante salvar(Restaurante restaurante) {
-        if(restaurante.getCozinha() != null){
-            Long cozinhaId = restaurante.getCozinha().getId();
-
-            boolean cozinhaTemp = cozinhaRepository.existsById(cozinhaId);
-            if (cozinhaTemp) {
-                restauranteRepository.save(restaurante);
-            }else{
-                throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
-            }
+    public void salvar(Restaurante restaurante) {
+        Long cozinhaId = restaurante.getCozinha().getId();
+        boolean cozinhaTemp = cozinhaRepository.existsById(cozinhaId);
+        if (cozinhaTemp) {
+            restauranteRepository.save(restaurante);
         }
-        restauranteRepository.save(restaurante);
-        return restaurante;
-
+        throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
     }
     public void atualizar(Long id, Restaurante restaurante){
         try{
@@ -59,18 +52,10 @@ public class RestauranteService {
                     restauranteRepository.save(resTemp);
 //                }
             }
-            throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
+            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
         }catch (EntidadeNaoEncontradaException e){
             throw new EntidadeNaoEncontradaException(String.format("Teste", id));
         }
 
-    }
-    public void deletar(Long id){
-        Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
-        if(restauranteTemp.isPresent()){
-            restauranteRepository.deleteById(id);
-        }else{
-            throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrado."));
-        }
     }
 }
