@@ -1,5 +1,6 @@
 package com.algaworks.algafood.api.controller;
 
+import com.algaworks.algafood.api.model.Cozinha;
 import com.algaworks.algafood.api.model.Restaurante;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.service.RestauranteService;
@@ -38,5 +39,15 @@ public class RestauranteController {
     public ResponseEntity<Restaurante> atualizar(@PathVariable Long id, @RequestBody Restaurante restaurante){
         restauranteService.atualizar(id, restaurante);
         return ResponseEntity.ok(restaurante);
+    }
+    @DeleteMapping("restaurantes/{id}")
+    public  ResponseEntity<Optional<Restaurante>> deletar(@PathVariable Long id){
+        try {
+            restauranteService.deletar(id);
+            return ResponseEntity.noContent().build();
+        }catch (EntidadeNaoEncontradaException e){
+            return ResponseEntity.notFound().build();
+        }
+
     }
 }

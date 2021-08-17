@@ -28,6 +28,7 @@ public class CozinhaController {
     public ResponseEntity<Optional<Cozinha>> buscar (@PathVariable Long id){
         return cozinhaService.buscarPorId(id);
     }
+
     @PostMapping("cozinhas")
     @ResponseStatus(HttpStatus.CREATED)
     public Cozinha adicionar(@RequestBody Cozinha cozinha){
