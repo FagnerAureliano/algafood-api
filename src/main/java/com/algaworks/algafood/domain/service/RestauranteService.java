@@ -58,4 +58,12 @@ public class RestauranteService {
         }
 
     }
+    public void deletar(Long id){
+        Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
+        if(restauranteTemp.isPresent()){
+            restauranteRepository.deleteById(id);
+        }else{
+            throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrado."));
+        }
+    }
 }
