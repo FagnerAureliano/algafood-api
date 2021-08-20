@@ -1,13 +1,18 @@
 package com.algaworks.algafood.domain.service;
 
+import com.algaworks.algafood.api.model.Estado;
 import com.algaworks.algafood.api.model.Restaurante;
+import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +41,9 @@ public class RestauranteService {
         boolean cozinhaTemp = cozinhaRepository.existsById(cozinhaId);
         if (cozinhaTemp) {
             restauranteRepository.save(restaurante);
+        }else{
+            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
         }
-        throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.", cozinhaId));
     }
     public void atualizar(Long id, Restaurante restaurante){
         try{
@@ -45,25 +51,34 @@ public class RestauranteService {
             if(restauranteTemp.isPresent()){
 //                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
 //                if(cozinhaTemp){
-                    Restaurante resTemp = Restaurante.builder().id(id).build();
-                    resTemp.setNome(restaurante.getNome());
-                    resTemp.setTaxaFrete(restaurante.getTaxaFrete());
-                    resTemp.setCozinha(restaurante.getCozinha());
+                    Restaurante resTemp = new Restaurante();
+                BeanUtils.copyProperties(resTemp, restaurante);
+                resTemp.setId(id);
+//                    Restaurante resTemp = Restaurante.builder().id(id).build();
+//                    resTemp.setNome(restaurante.getNome());
+//                    resTemp.setTaxaFrete(restaurante.getTaxaFrete());
+//                    resTemp.setCozinha(restaurante.getCozinha());
                     restauranteRepository.save(resTemp);
 //                }
             }
             throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
-        }catch (EntidadeNaoEncontradaException e){
-            throw new EntidadeNaoEncontradaException(String.format("Teste", id));
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (EntidadeNaoEncontradaException e){
+            throw new EntidadeNaoEncontradaException(String.format("Restaurante não encontrado com o id:", id));
         }
 
     }
-    public void deletar(Long id){
-        Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
-        if(restauranteTemp.isPresent()){
-            restauranteRepository.deleteById(id);
-        }else{
-            throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrado."));
+    public void remover(Long id){
+        try{
+            Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
+            if(restauranteTemp.isPresent()){
+                restauranteRepository.deleteById(restauranteTemp.get().getId());
+            }else{
+                throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrado."));
+            }
+        }catch (DataIntegrityViolationException e){
+          throw new EntidadeEmUsoException(String.format("Restaurante de código %d não pode ser removida, pois está em uso.", id));
         }
     }
 }

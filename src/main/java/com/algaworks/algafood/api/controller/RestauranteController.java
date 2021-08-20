@@ -1,7 +1,7 @@
 package com.algaworks.algafood.api.controller;
 
-import com.algaworks.algafood.api.model.Cozinha;
 import com.algaworks.algafood.api.model.Restaurante;
+import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.service.RestauranteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +46,14 @@ public class RestauranteController {
         }
     }
     @DeleteMapping("restaurantes/{id}")
-    public ResponseEntity<?> deletar(@PathVariable Long id){
+    public ResponseEntity<Optional<Restaurante>> deletar(@PathVariable Long id){
         try{
-            restauranteService.deletar(id);
-        }catch (EntidadeNaoEncontradaException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            restauranteService.remover(id);
+        }catch (EntidadeNaoEncontradaException e) {
+            return ResponseEntity.notFound().build();
+        }catch (EntidadeEmUsoException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        return ResponseEntity.notFound().build();
+        return null;
     }
 }
