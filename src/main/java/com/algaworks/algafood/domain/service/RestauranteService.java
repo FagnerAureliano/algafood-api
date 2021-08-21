@@ -1,5 +1,6 @@
 package com.algaworks.algafood.domain.service;
 
+import com.algaworks.algafood.api.model.Cozinha;
 import com.algaworks.algafood.api.model.Estado;
 import com.algaworks.algafood.api.model.Restaurante;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
@@ -47,27 +48,33 @@ public class RestauranteService {
     }
     public void atualizar(Long id, Restaurante restaurante){
         try{
-        Optional<Restaurante> restauranteTemp = restauranteRepository.findById(id);
-            if(restauranteTemp.isPresent()){
+            boolean restauranteTemp = restauranteRepository.existsById(id);
+
+            if (restaurante.getCozinha() != null) {
+                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
+                if (!cozinhaTemp){
+                    throw new EntidadeNaoEncontradaException(String.format("Cozinha não foi encontrada."));
+                }
+            }
+
+            if(restauranteTemp ){
 //                boolean cozinhaTemp = cozinhaRepository.existsById(restaurante.getCozinha().getId());
 //                if(cozinhaTemp){
-                    Restaurante resTemp = new Restaurante();
+                Restaurante resTemp = new Restaurante();
                 BeanUtils.copyProperties(resTemp, restaurante);
-                resTemp.setId(id);
+                   resTemp.setId(id);
 //                    Restaurante resTemp = Restaurante.builder().id(id).build();
 //                    resTemp.setNome(restaurante.getNome());
 //                    resTemp.setTaxaFrete(restaurante.getTaxaFrete());
 //                    resTemp.setCozinha(restaurante.getCozinha());
                     restauranteRepository.save(resTemp);
 //                }
+            }else{
+                throw new EntidadeNaoEncontradaException(String.format("Restaurante com o id %d não foi encontrado.", id));
             }
-            throw new EntidadeNaoEncontradaException(String.format("Cozinha com o id %d não foi encontrada.",restaurante.getCozinha().getId()));
         } catch (InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (EntidadeNaoEncontradaException e){
             throw new EntidadeNaoEncontradaException(String.format("Restaurante não encontrado com o id:", id));
         }
-
     }
     public void remover(Long id){
         try{

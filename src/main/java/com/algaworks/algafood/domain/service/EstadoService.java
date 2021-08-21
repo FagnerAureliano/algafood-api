@@ -2,6 +2,7 @@ package com.algaworks.algafood.domain.service;
 
 import com.algaworks.algafood.api.model.Estado;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algaworks.algafood.domain.repository.CidadeRepository;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class EstadoService {
     @Autowired
     EstadoRepository estadoRepository;
 
+    @Autowired
+    CidadeRepository cidadeRepository;
+
     public List<Estado> listar(){
         return estadoRepository.findAll();
     }
@@ -31,8 +35,18 @@ public class EstadoService {
         }
     }
     public ResponseEntity<Estado> salvar(Estado estado){
-        estadoRepository.save(estado);
-        return ResponseEntity.ok(estado);
+
+            if(estado.getCidade() != null){
+                boolean cidTemp = cidadeRepository.existsById(estado.getCidade().getId());
+                if(!cidTemp){
+                    throw new EntidadeNaoEncontradaException(String.format("Cidade não encontrada"));
+                }
+            }else{
+                estadoRepository.save(estado);
+                return ResponseEntity.ok(estado);
+            }
+        return ResponseEntity.noContent().build();
+
     }
     public void atualizar(Long id, Estado estado){
         try {

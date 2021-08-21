@@ -40,9 +40,9 @@ public class RestauranteController {
 
         try {
             restauranteService.atualizar(id, restaurante);
-            return ResponseEntity.ok(restaurante);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
         }catch (EntidadeNaoEncontradaException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
     @DeleteMapping("restaurantes/{id}")
