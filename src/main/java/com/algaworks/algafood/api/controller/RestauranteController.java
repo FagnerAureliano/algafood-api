@@ -1,5 +1,6 @@
 package com.algaworks.algafood.api.controller;
 
+import com.algaworks.algafood.api.controller.api.RestauranteAPI;
 import com.algaworks.algafood.api.model.Restaurante;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
@@ -13,15 +14,18 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class RestauranteController {
+public class RestauranteController implements RestauranteAPI {
 
     @Autowired
     RestauranteService restauranteService;
 
-    @GetMapping("restaurantes")
-    public List<Restaurante> listar(){
-        return restauranteService.listar();
+    @GetMapping("restaurantes")@Override
+    public Object listar( @RequestParam(name = "fields", required = false) List<String> fieldList) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+        return null;
     }
+//    public List<Restaurante> listar(@RequestParam(name = "fields", required = false)){
+//        return restauranteService.listar( 'fields');
+//    }
     @GetMapping("restaurantes/{id}")
     public ResponseEntity<Optional<Restaurante>> buscarPorId(@PathVariable Long id){
         return restauranteService.buscarPorId(id);
@@ -56,4 +60,6 @@ public class RestauranteController {
         }
         return null;
     }
+
+
 }

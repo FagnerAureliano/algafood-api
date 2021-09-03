@@ -1,21 +1,23 @@
 package com.algaworks.algafood.domain.service;
 
-import com.algaworks.algafood.api.model.Cozinha;
-import com.algaworks.algafood.api.model.Estado;
 import com.algaworks.algafood.api.model.Restaurante;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
+import com.algaworks.algafood.utils.MessageUtil;
+import com.algaworks.algafood.utils.PropertyExtractorUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RestauranteService {
@@ -25,7 +27,15 @@ public class RestauranteService {
     @Autowired
     CozinhaRepository cozinhaRepository;
 
-    public List<Restaurante> listar() {
+    @Autowired
+    private MessageUtil messageUtil;
+
+
+    private final String defaultError = "database.not_found";
+    private final String defaultObject = "Objeto";
+
+
+    public List<Restaurante> listar( List<String> fieldList) {
         return restauranteRepository.findAll();
     }
 
@@ -87,5 +97,46 @@ public class RestauranteService {
         }catch (DataIntegrityViolationException e){
           throw new EntidadeEmUsoException(String.format("Restaurante de código %d não pode ser removida, pois está em uso.", id));
         }
+    }
+
+
+
+
+    public List<Object> getFields(List<?> list, List<String> fieldList) {
+        return fieldList == null || fieldList.isEmpty()
+                ? (List<Object>) list
+                : list.stream().map(item -> PropertyExtractorUtil.extract(item, fieldList)).collect(Collectors.toList());
+    }
+
+    public Object getFields(Object obj, List<String> fieldList) {
+        if (obj != null) {
+            return fieldList == null || fieldList.isEmpty() ? obj : PropertyExtractorUtil.extract(obj, fieldList);
+        }
+
+        throw new EntityNotFoundException(messageUtil.getMessage(defaultError, defaultObject));
+    }
+
+    public Object getFields(Object obj, List<String> fieldList, String errorMessage) {
+        if (obj != null) {
+            return fieldList == null || fieldList.isEmpty() ? obj : PropertyExtractorUtil.extract(obj, fieldList);
+        }
+
+        throw new EntityNotFoundException(messageUtil.getMessage(defaultError, errorMessage));
+    }
+
+    public Object getFields(Optional<?> obj, List<String> fieldList) {
+        if (obj.isPresent()) {
+            return fieldList == null || fieldList.isEmpty() ? obj.get() : PropertyExtractorUtil.extract(obj.get(), fieldList);
+        }
+
+        throw new EntityNotFoundException(messageUtil.getMessage(defaultError, defaultObject));
+    }
+
+    public Object getFields(Optional<?> obj, List<String> fieldList, String errorMessage) {
+        if (obj.isPresent()) {
+            return fieldList == null || fieldList.isEmpty() ? obj.get() : PropertyExtractorUtil.extract(obj.get(), fieldList);
+        }
+
+        throw new EntityNotFoundException(messageUtil.getMessage(defaultError, errorMessage));
     }
 }
